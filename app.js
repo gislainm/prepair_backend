@@ -28,7 +28,7 @@ app.use((err, req, res, next) => {
 mongoose.set("strictQuery", false);
 mongoose.connect(process.env.mongoAtlasUri)
     .then(() => {
-        app.listen(process.env.port, () => { console.log('welcome to Pre-Pair') })
+        app.listen(process.env.port  || 8080, () => { console.log('welcome to Pre-Pair') })
     })
     .catch((error)=>{
         console.log(error)
