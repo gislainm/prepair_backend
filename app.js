@@ -10,6 +10,8 @@ const responseInfo = require('./models/responseInfo');
 const path = require('path');
 
 const app = express();
+const server_host = process.env.YOUR_HOST || '0.0.0.0';
+
 
 app.use(cors());
 app.use(express.json());
@@ -28,7 +30,7 @@ app.use((err, req, res, next) => {
 mongoose.set("strictQuery", false);
 mongoose.connect(process.env.mongoAtlasUri)
     .then(() => {
-        app.listen(process.env.port  || 8000, () => { console.log('welcome to Pre-Pair') })
+        app.listen(process.env.port  || 8000, server_host, () => { console.log('welcome to Pre-Pair') })
     })
     .catch((error)=>{
         console.log(error)
