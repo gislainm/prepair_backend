@@ -30,7 +30,7 @@ app.use((err, req, res, next) => {
 mongoose.set("strictQuery", false);
 mongoose.connect(process.env.mongoAtlasUri)
     .then(() => {
-        app.listen(process.env.port  || 8000, server_host, () => { console.log('welcome to Pre-Pair') })
+        app.listen(process.env.port  || 5000 ,() => { console.log('welcome to Pre-Pair') })
     })
     .catch((error)=>{
         console.log(error)
