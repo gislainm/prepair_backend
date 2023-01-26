@@ -7,10 +7,8 @@ const mongoose = require('mongoose');
 const userRouter = require('./routes/userRouter');
 const messageRouter = require("./routes/messageRouter");
 const responseInfo = require('./models/responseInfo');
-const path = require('path');
 
 const app = express();
-const server_host = process.env.YOUR_HOST || '0.0.0.0';
 
 
 app.use(cors());
@@ -35,15 +33,3 @@ mongoose.connect(process.env.mongoAtlasUri)
     .catch((error)=>{
         console.log(error)
     })
-// try{
-// mongoose.connect(
-//     mongoAtlasUri,
-//     {useNewUrlParser:true, useUnifiedTopology:true},
-//     ()=>console.log("Mongoose is connected")
-// ).then(()=>{
-//     app.listen(8080, () => { console.log('welcome to Pre-Pair') })
-// })
-// }catch(error){
-//     console.log("could not connect");
-// }
-//mongodb://localhost:27017/PrePairDB
