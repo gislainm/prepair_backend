@@ -1,19 +1,51 @@
 "use strict";
 /*eslint-disable */
 
+require('dotenv').config()
 const User = require('../models/user');
 const Message = require('../models/messages');
 const responseInfo = require('../models/responseInfo');
 const { ObjectId } = require('mongodb');
+const nodemailer = require('nodemailer');
+
+
+let transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      type: 'OAuth2',
+      user: process.env.MAIL_USERNAME,
+      pass: process.env.MAIL_PASSWORD,
+      clientId: process.env.OAUTH_CLIENTID,
+      clientSecret: process.env.OAUTH_CLIENT_SECRET,
+      refreshToken: process.env.OAUTH_REFRESH_TOKEN
+    }
+  });
 
 exports.sendMessage = async (req, res, next) => {
     const receiver = req.body.receiver;
     const sender = req.body.sender;
+    const sender_name = req.body.senderName;
+    const receiver_email = req.body.receiverEmail;
     const messageRoom = await Message.findOne({ participants: { $all: [sender, receiver] } });
+    let mailOptions = {
+        from: process.env.MAIL_USERNAME,
+        to: receiver_email,
+        subject: `Prepair-New message from ${sender_name}`,
+        text: req.body.messageBody
+      };
+  
     try {
         if(messageRoom){
             await Message.updateOne({_id:messageRoom._id},{$push:{messages:req.body}});
             const updatedRoom = await Message.findOne({_id:messageRoom._id}).populate("participants");
+            transporter.sendMail(mailOptions, function(err, data) {
+                if (err) {
+                  console.log("Error " + err);
+                } else {
+                  console.log("Email sent successfully");
+                }
+              });
+          
             res.status(201).json(new responseInfo(false, null, updatedRoom));
         }else{
             const newMessage = new Message({
@@ -21,7 +53,14 @@ exports.sendMessage = async (req, res, next) => {
                 messages:[req.body]
             })
             await newMessage.save()
-            const newMessageToReturn = await Message.findOne({_id:newMessage._id}).populate("participants") 
+            const newMessageToReturn = await Message.findOne({_id:newMessage._id}).populate("participants");
+            transporter.sendMail(mailOptions, function(err, data) {
+                if (err) {
+                  console.log("Error " + err);
+                } else {
+                  console.log("Email sent successfully",data);
+                }
+              }); 
             res.status(201).json(new responseInfo(false, null, newMessageToReturn));
         }
     } catch (error) {
